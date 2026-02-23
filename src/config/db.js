@@ -38,4 +38,4 @@ const testConnection = async () => {
 
 
 
-export default testConnection;
+export default testConnection

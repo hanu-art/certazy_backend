@@ -1,9 +1,9 @@
 // src/modules/auth/auth.queries.js
 
-import db from '../../config/db.js'
+import { pool } from "../../config/db.js"
 
 const findByEmail = async (email) => {
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     'SELECT * FROM users WHERE email = ? LIMIT 1',
     [email]
   )
@@ -11,7 +11,7 @@ const findByEmail = async (email) => {
 }
 
 const findById = async (id) => {
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     `SELECT id, name, email, role, gender, mobile, avatar,
             oauth_provider, is_verified, is_active, is_first_login,
             created_at
@@ -22,7 +22,7 @@ const findById = async (id) => {
 }
 
 const createUser = async ({ name, email, password, role = 'student' }) => {
-  const [result] = await db.query(
+  const [result] = await pool.query(
     `INSERT INTO users (name, email, password, role, oauth_provider)
      VALUES (?, ?, ?, ?, 'local')`,
     [name, email, password, role]
@@ -31,14 +31,14 @@ const createUser = async ({ name, email, password, role = 'student' }) => {
 }
 
 const saveRefreshToken = async ({ userId, token, expiresAt }) => {
-  await db.query(
+  await pool.query(
     'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
     [userId, token, expiresAt]
   )
 }
 
 const findRefreshToken = async (token) => {
-  const [rows] = await db.query(
+  const [rows] = await pool.query(
     `SELECT rt.*, u.id as uid, u.role, u.is_active
      FROM refresh_tokens rt
      JOIN users u ON u.id = rt.user_id
@@ -50,22 +50,22 @@ const findRefreshToken = async (token) => {
 }
 
 const deleteRefreshToken = async (token) => {
-  await db.query('DELETE FROM refresh_tokens WHERE token = ?', [token])
+  await pool.query('DELETE FROM refresh_tokens WHERE token = ?', [token])
 }
 
 const deleteAllRefreshTokens = async (userId) => {
-  await db.query('DELETE FROM refresh_tokens WHERE user_id = ?', [userId])
+  await pool.query('DELETE FROM refresh_tokens WHERE user_id = ?', [userId])
 }
 
 const updatePassword = async (userId, hashedPassword) => {
-  await db.query(
+  await pool.query(
     'UPDATE users SET password = ?, is_first_login = 0 WHERE id = ?',
     [hashedPassword, userId]
   )
 }
 
 const verifyEmail = async (userId) => {
-  await db.query('UPDATE users SET is_verified = 1 WHERE id = ?', [userId])
+  await pool.query('UPDATE users SET is_verified = 1 WHERE id = ?', [userId])
 }
 
 export {
