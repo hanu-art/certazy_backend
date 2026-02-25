@@ -51,10 +51,35 @@ const changePasswordSchema = Joi.object({
     }),
 })
 
+
+// category relted scema  
+
+const createCategorySchema = Joi.object({
+  name       : Joi.string().min(2).max(100).required(),
+  slug       : Joi.string().max(120).optional(),
+  description: Joi.string().optional(),
+  icon       : Joi.string().max(255).optional(),
+  parent_id  : Joi.number().integer().optional(),
+  sort_order : Joi.number().integer().default(0).optional(),
+})
+
+const updateCategorySchema = Joi.object({
+  name       : Joi.string().min(2).max(100).optional(),
+  slug       : Joi.string().max(120).optional(),
+  description: Joi.string().optional(),
+  icon       : Joi.string().max(255).optional(),
+  parent_id  : Joi.number().integer().optional(),
+  is_active  : Joi.boolean().optional(),
+  sort_order : Joi.number().integer().optional(),
+})
+
+
 const schemas = {
   register      : registerSchema,
   login         : loginSchema,
   changePassword: changePasswordSchema,
+  createCategory  : createCategorySchema,
+  updateCategory  : updateCategorySchema,
 }
 
 export { validate, schemas }
