@@ -10,6 +10,8 @@ import errorHandler from './middleware/errorHandler.js'
 import { apiLimiter } from './middleware/rateLimit.js'
 import authRoutes from './modules/auth/auth.routes.js'
 import categoryRoutes from './modules/categories/categories.routes.js'
+import coursesRoutes from './modules/courses/courses.routes.js'
+
 const app = express()
 
 // ─── SECURITY ────────────────────────────────────────────────
@@ -41,7 +43,7 @@ app.get('/health', (req, res) => {
 // ─── ROUTES ──────────────────────────────────────────────────
 app.use('/api/auth', authRoutes)
 app.use("/api/category", categoryRoutes)
-// app.use('/api/courses', coursesRoutes)
+ app.use('/api/courses', coursesRoutes)
 // app.use('/api/admin', adminRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────

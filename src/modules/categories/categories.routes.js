@@ -15,8 +15,8 @@ router.get('/slug/:slug', controller.getCategoryBySlug)
 router.get('/:id',        controller.getCategoryById)
 
 // ─── ADMIN ONLY ───────────────────────────────────────────────
-router.post('/', authenticate, role('admin'),   validate(schemas.createCategory), controller.createCategory)
-router.put('/:id',  authenticate,role('admin'),  validate(schemas.updateCategory), controller.updateCategory)
-router.delete('/:id', authenticate,role('admin'),                                  controller.deleteCategory)
+router.post('/create', authenticate, role('admin'),   validate(schemas.createCategory), controller.createCategory)
+router.put('/update/:id',  authenticate,role('admin'),  validate(schemas.updateCategory), controller.updateCategory)
+router.delete('/delete/:id', authenticate,role('admin'),                                  controller.deleteCategory)
 
 export default router

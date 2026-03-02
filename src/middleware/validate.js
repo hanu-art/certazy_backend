@@ -74,12 +74,51 @@ const updateCategorySchema = Joi.object({
 })
 
 
+// courses related scema 
+const createCourseSchema = Joi.object({
+  title              : Joi.string().min(3).max(200).required(),
+  slug               : Joi.string().max(220).optional(),
+  description        : Joi.string().optional(),
+  short_desc         : Joi.string().max(500).optional(),
+  category_id        : Joi.number().integer().required(),
+  thumbnail          : Joi.string().max(500).optional(),
+  preview_video      : Joi.string().max(500).optional(),
+  price              : Joi.number().min(0).optional(),
+  level              : Joi.string().valid('beginner', 'intermediate', 'advanced').optional(),
+  language           : Joi.string().max(50).optional(),
+  status             : Joi.string().valid('draft', 'published', 'archived').optional(),
+  is_featured        : Joi.boolean().optional(),
+  requirements       : Joi.string().optional(),
+  what_you_learn     : Joi.string().optional(),
+  certificate_eligible: Joi.number().integer().valid(0, 1).optional(),
+})
+
+const updateCourseSchema = Joi.object({
+  title              : Joi.string().min(3).max(200).optional(),
+  slug               : Joi.string().max(220).optional(),
+  description        : Joi.string().optional(),
+  short_desc         : Joi.string().max(500).optional(),
+  category_id        : Joi.number().integer().optional(),
+  thumbnail          : Joi.string().max(500).optional(),
+  preview_video      : Joi.string().max(500).optional(),
+  price              : Joi.number().min(0).optional(),
+  level              : Joi.string().valid('beginner', 'intermediate', 'advanced').optional(),
+  language           : Joi.string().max(50).optional(),
+  status             : Joi.string().valid('draft', 'published', 'archived').optional(),
+  is_featured        : Joi.boolean().optional(),
+  requirements       : Joi.string().optional(),
+  what_you_learn     : Joi.string().optional(),
+  certificate_eligible: Joi.number().integer().valid(0, 1).optional(),
+})
+
 const schemas = {
   register      : registerSchema,
   login         : loginSchema,
   changePassword: changePasswordSchema,
   createCategory  : createCategorySchema,
   updateCategory  : updateCategorySchema,
+  createCourse: createCourseSchema,
+  updateCourse: updateCourseSchema,
 }
 
 export { validate, schemas }
