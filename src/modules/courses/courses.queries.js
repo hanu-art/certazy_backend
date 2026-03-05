@@ -118,6 +118,13 @@ const checkCategoryExists = (category_id) =>
     [category_id]
   )
 
+  // ── Check if course exists and not archived ────────────────────────────────
+const checkCourseExists = (course_id) =>
+  pool.query(
+    "SELECT id FROM courses WHERE id = ? AND status != 'archived' LIMIT 1",
+    [course_id]
+  )
+
 // ── Create course ──────────────────────────────────────────────────────────
 const createCourse = ({
   title, slug, description, short_desc, category_id,
@@ -205,6 +212,7 @@ export {
   getCourseById,
   checkSlugExists,
   checkCategoryExists,
+  checkCourseExists,
   createCourse,
   updateCourse,
   deleteCourseById,

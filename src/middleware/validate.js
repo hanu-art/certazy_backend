@@ -74,7 +74,7 @@ const updateCategorySchema = Joi.object({
 })
 
 
-// courses related scema 
+// courses related scemas 
 const createCourseSchema = Joi.object({
   title              : Joi.string().min(3).max(200).required(),
   slug               : Joi.string().max(220).optional(),
@@ -111,6 +111,18 @@ const updateCourseSchema = Joi.object({
   certificate_eligible: Joi.number().integer().valid(0, 1).optional(),
 })
 
+//section releted schemas
+const createSectionSchema = Joi.object({
+  course_id : Joi.number().integer().required(),
+  title     : Joi.string().min(2).max(200).required(),
+  order_num : Joi.number().integer().optional(),
+})
+
+const updateSectionSchema = Joi.object({
+  title     : Joi.string().min(2).max(200).optional(),
+  order_num : Joi.number().integer().optional(),
+})
+
 const schemas = {
   register      : registerSchema,
   login         : loginSchema,
@@ -119,6 +131,8 @@ const schemas = {
   updateCategory  : updateCategorySchema,
   createCourse: createCourseSchema,
   updateCourse: updateCourseSchema,
+  createSection: createSectionSchema,
+updateSection: updateSectionSchema,
 }
 
 export { validate, schemas }
