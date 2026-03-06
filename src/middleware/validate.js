@@ -123,6 +123,90 @@ const updateSectionSchema = Joi.object({
   order_num : Joi.number().integer().optional(),
 })
 
+// lessson related scema 
+
+const createLessonSchema = Joi.object({
+  section_id : Joi.number().integer().required(),
+  title      : Joi.string().min(2).max(200).required(),
+  type       : Joi.string().valid('video', 'article', 'quiz').optional(),
+  content    : Joi.string().optional(),
+  duration   : Joi.number().integer().optional(),
+  order_num  : Joi.number().integer().optional(),
+  is_free    : Joi.number().integer().valid(0, 1).optional(),
+})
+
+const updateLessonSchema = Joi.object({
+  title      : Joi.string().min(2).max(200).optional(),
+  type       : Joi.string().valid('video', 'article', 'quiz').optional(),
+  content    : Joi.string().optional(),
+  duration   : Joi.number().integer().optional(),
+  order_num  : Joi.number().integer().optional(),
+  is_free    : Joi.number().integer().valid(0, 1).optional(),
+})
+
+
+// Tests
+const createTestSchema = Joi.object({
+  course_id      : Joi.number().integer().required(),
+  lesson_id      : Joi.number().integer().optional(),
+  title          : Joi.string().min(2).max(200).required(),
+  type           : Joi.string().valid('practice','mock','diagnostic','final').optional(),
+  duration       : Joi.number().integer().optional(),
+  pass_percentage: Joi.number().integer().min(1).max(100).optional(),
+  status         : Joi.string().valid('active','inactive').optional(),
+})
+
+const updateTestSchema = Joi.object({
+  title          : Joi.string().min(2).max(200).optional(),
+  type           : Joi.string().valid('practice','mock','diagnostic','final').optional(),
+  duration       : Joi.number().integer().optional(),
+  pass_percentage: Joi.number().integer().min(1).max(100).optional(),
+  status         : Joi.string().valid('active','inactive').optional(),
+})
+
+// Questions
+const createQuestionSchema = Joi.object({
+  test_id    : Joi.number().integer().required(),
+  question   : Joi.string().required(),
+  type       : Joi.string().valid('single','multiple','true_false').optional(),
+  explanation: Joi.string().optional(),
+  difficulty : Joi.string().valid('easy','medium','hard').optional(),
+  topic_tag  : Joi.string().max(100).optional(),
+  order_num  : Joi.number().integer().optional(),
+})
+
+const updateQuestionSchema = Joi.object({
+  question   : Joi.string().optional(),
+  type       : Joi.string().valid('single','multiple','true_false').optional(),
+  explanation: Joi.string().optional(),
+  difficulty : Joi.string().valid('easy','medium','hard').optional(),
+  topic_tag  : Joi.string().max(100).optional(),
+  order_num  : Joi.number().integer().optional(),
+})
+
+// Options
+const createOptionSchema = Joi.object({
+  question_id: Joi.number().integer().required(),
+  option_text: Joi.string().required(),
+  is_correct : Joi.number().integer().valid(0,1).optional(),
+  order_num  : Joi.number().integer().optional(),
+})
+
+const bulkCreateOptionsSchema = Joi.object({
+  question_id: Joi.number().integer().required(),
+  options    : Joi.array().items(Joi.object({
+    option_text: Joi.string().required(),
+    is_correct : Joi.number().integer().valid(0,1).optional(),
+    order_num  : Joi.number().integer().optional(),
+  })).min(2).required(),
+})
+
+const updateOptionSchema = Joi.object({
+  option_text: Joi.string().optional(),
+  is_correct : Joi.number().integer().valid(0,1).optional(),
+  order_num  : Joi.number().integer().optional(),
+})
+
 const schemas = {
   register      : registerSchema,
   login         : loginSchema,
@@ -133,6 +217,15 @@ const schemas = {
   updateCourse: updateCourseSchema,
   createSection: createSectionSchema,
 updateSection: updateSectionSchema,
+ createLesson  : createLessonSchema,
+  updateLesson  : updateLessonSchema,
+  createTest: createTestSchema,
+  updateTest: updateTestSchema,
+  createQuestion: createQuestionSchema,
+  updateQuestion: updateQuestionSchema,
+  createOption: createOptionSchema,
+  bulkCreateOptions: bulkCreateOptionsSchema,
+  updateOption: updateOptionSchema,
 }
 
 export { validate, schemas }

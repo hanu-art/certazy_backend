@@ -12,6 +12,10 @@ import authRoutes from './modules/auth/auth.routes.js'
 import categoryRoutes from './modules/categories/categories.routes.js'
 import coursesRoutes from './modules/courses/courses.routes.js'
 import sectionRoutes from './modules/sections/sections.routes.js'
+import lessonRoutes from './modules/lessons/lessons.routes.js'
+import testRoutes from './modules/tests/tests.routes.js'
+import questionRoutes from './modules/questions/questions.routes.js'
+import optionRoutes from './modules/options/options.routes.js'
 
 const app = express()
 
@@ -46,6 +50,10 @@ app.use('/api/auth', authRoutes)
 app.use("/api/category", categoryRoutes)
  app.use('/api/courses', coursesRoutes)
  app.use('/api/sections', sectionRoutes)
+ app.use('/api/lessons', lessonRoutes)
+ app.use('/api/tests',     testRoutes)
+app.use('/api/questions', questionRoutes)
+app.use('/api/options',   optionRoutes)
 // app.use('/api/admin', adminRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────
