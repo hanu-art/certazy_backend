@@ -102,8 +102,22 @@ const env = {
     keySecret: process.env.RAZORPAY_KEY_SECRET,
   },
 
+paypal: {
+  clientId    : process.env.PAYPAL_CLIENT_ID,
+  clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+  mode        : process.env.PAYPAL_MODE || 'sandbox', // sandbox ya live
+},
+
   // Frontend
-  frontendUrl: process.env.FRONTEND_URL,
+  frontendUrl: process.env.FRONTEND_URL, 
+
+  spaces: {
+  region   : process.env.SPACES_REGION,
+  accessKey: process.env.SPACES_ACCESS_KEY,
+  secretKey: process.env.SPACES_SECRET_KEY,
+  bucket   : process.env.SPACES_BUCKET,
+}
 };
+
 
 export default env
