@@ -6,7 +6,7 @@ import * as queries from '../modules/auth/auth.queries.js'
 const authenticate = async (req, res, next) => {
   try {
     const token = req.cookies?.accessToken
- 
+   
     if (!token) {
       const err = new Error('Access token required')
       err.statusCode = 401
@@ -16,6 +16,7 @@ const authenticate = async (req, res, next) => {
     let decoded
     try {
       decoded = tokenUtil.verifyAccessToken(token)
+   
     } catch (e) {
       const err = new Error(e.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token')
       err.statusCode = 401

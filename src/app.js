@@ -16,7 +16,9 @@ import lessonRoutes from './modules/lessons/lessons.routes.js'
 import testRoutes from './modules/tests/tests.routes.js'
 import questionRoutes from './modules/questions/questions.routes.js'
 import optionRoutes from './modules/options/options.routes.js'
-
+import enrollmentRoutes from './modules/enrollments/enrollments.routes.js'
+import attemptRoutes from './modules/attempts/attempts.routes.js'
+import progressRoutes from './modules/progress/progress.routes.js'
 const app = express()
 
 // ─── SECURITY ────────────────────────────────────────────────
@@ -54,6 +56,11 @@ app.use("/api/category", categoryRoutes)
  app.use('/api/tests',     testRoutes)
 app.use('/api/questions', questionRoutes)
 app.use('/api/options',   optionRoutes)
+app.use('/api/enrollments', enrollmentRoutes)
+app.use('/api/attempts', attemptRoutes)
+app.use('/api/progress', progressRoutes)
+
+
 // app.use('/api/admin', adminRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────

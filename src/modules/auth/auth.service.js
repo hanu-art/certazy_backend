@@ -50,6 +50,7 @@ const login = async ({ email, password }) => {
   }
 
   const tokens = await generateTokens(user)
+
   return {
     user        : sanitizeUser(user),
     ...tokens,

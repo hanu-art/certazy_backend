@@ -103,6 +103,7 @@ const githubCallback = async (req, res, next) => {
 
 const me = async (req, res, next) => {
   try {
+
     return success(res, { message: 'User fetched', data: { user: req.user } })
   } catch (err) {
     next(err)
