@@ -19,6 +19,11 @@ import optionRoutes from './modules/options/options.routes.js'
 import enrollmentRoutes from './modules/enrollments/enrollments.routes.js'
 import attemptRoutes from './modules/attempts/attempts.routes.js'
 import progressRoutes from './modules/progress/progress.routes.js'
+import paymentRoutes from "./modules/payments/payments.routes.js"
+import discountRoutes from "./modules/discounts/discounts.routes.js"
+import certificateRoutes from "./modules/certificates/certificates.routes.js"
+
+
 const app = express()
 
 // ─── SECURITY ────────────────────────────────────────────────
@@ -28,6 +33,8 @@ app.use(cors({
   credentials: true,
   methods    : ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }))
+
+app.use('/api/payments/razorpay/webhook', express.raw({ type: 'application/json' }))
 
 // ─── BODY PARSING ────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }))
@@ -59,7 +66,9 @@ app.use('/api/options',   optionRoutes)
 app.use('/api/enrollments', enrollmentRoutes)
 app.use('/api/attempts', attemptRoutes)
 app.use('/api/progress', progressRoutes)
-
+app.use('/api/payments', paymentRoutes)
+app.use('/api/discounts', discountRoutes)
+app.use('/api/certificates', certificateRoutes)
 
 // app.use('/api/admin', adminRoutes)
 
