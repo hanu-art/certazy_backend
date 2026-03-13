@@ -23,6 +23,7 @@ import paymentRoutes from "./modules/payments/payments.routes.js"
 import discountRoutes from "./modules/discounts/discounts.routes.js"
 import certificateRoutes from "./modules/certificates/certificates.routes.js"
 import reviewRoutes from "./modules/reviews/reviews.routes.js"
+import adminRoutes from "./modules/admin/admin.routes.js"
 
 const app = express()
 
@@ -70,8 +71,8 @@ app.use('/api/payments', paymentRoutes)
 app.use('/api/discounts', discountRoutes)
 app.use('/api/certificates', certificateRoutes)
 app.use('/api/reviews', reviewRoutes)
+app.use('/api/admin', adminRoutes)
 
-// app.use('/api/admin', adminRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────
 app.use((req, res) => {
