@@ -1,10 +1,10 @@
 // src/modules/discounts/discounts.service.js
 
-import { pool }           from '../../config/db.js'
-import * as queries       from './discounts.queries.js'
-import * as courseQueries from '../courses/courses.queries.js'
-import * as userQueries   from '../users/users.queries.js'
-import { generateUUID }   from '../../utils/generate.js'
+import { pool }            from '../../config/db.js'
+import * as queries        from './discounts.queries.js'
+import * as courseQueries  from '../courses/courses.queries.js'
+import { findById }        from '../auth/auth.queries.js'
+import { generateUUID }    from '../../utils/generate.js'
 import { sendDiscountJob } from '../../jobs/emailQueue.js'
 
 // ── Create discount link (admin) ───────────────────────────────────────────
@@ -20,13 +20,12 @@ const createDiscountLink = async (created_by, { user_id, course_id, discount_pri
   const course = courseRows[0]
 
   // Student exists check
-  const [userRows] = await userQueries.getUserById(user_id)
-  if (!userRows.length) {
+  const student = await findById(user_id)
+  if (!student) {
     const err = new Error('Student not found')
     err.statusCode = 404
     throw err
   }
-  const student = userRows[0]
 
   // Student already enrolled check
   const [enrollCheck] = await pool_query_check(user_id, course_id)
@@ -68,13 +67,13 @@ const createDiscountLink = async (created_by, { user_id, course_id, discount_pri
 
   // Email bhejo student ko (background job)
   await sendDiscountJob({
-    to            : student.email,
-    name          : student.name,
-    courseTitle   : course.title,
-    originalPrice : course.price,
-    discountPrice : discount_price,
+    to           : student.email,
+    name         : student.name,
+    courseTitle  : course.title,
+    originalPrice: course.price,
+    discountPrice: discount_price,
     token,
-    expiresAt     : expires_at,
+    expiresAt    : expires_at,
   })
 
   return {

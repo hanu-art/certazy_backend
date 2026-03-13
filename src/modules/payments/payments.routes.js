@@ -4,6 +4,7 @@ import { Router }      from 'express'
 import * as controller from './payments.controller.js'
 import authenticate    from '../../middleware/auth.js'
 import role            from '../../middleware/role.js'
+import permission      from '../../middleware/permission.js'
 import express         from 'express'
 
 const router = Router()
@@ -20,11 +21,11 @@ router.post(
 )
 
 // ─── PAYPAL ───────────────────────────────────────────────────
-router.post('/paypal/create-order',   authenticate, role('student'), controller.paypalCreateOrder)
-router.post('/paypal/capture',        authenticate, role('student'), controller.paypalCapture)
+router.post('/paypal/create-order',  authenticate, role('student'), controller.paypalCreateOrder)
+router.post('/paypal/capture',       authenticate, role('student'), controller.paypalCapture)
 
 // ─── HISTORY ──────────────────────────────────────────────────
-router.get('/history',                authenticate, role('student'),             controller.getMyPayments)
-router.get('/admin/all',              authenticate, role('admin', 'sub_admin'),  controller.getAllPayments)
+router.get('/history',     authenticate, role('student'),                                      controller.getMyPayments)
+router.get('/admin/all',   authenticate, role('admin', 'sub_admin'), permission('can_view_payments'), controller.getAllPayments)
 
 export default router

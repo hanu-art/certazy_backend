@@ -1,7 +1,7 @@
 // src/modules/admin/admin.service.js
 
-import * as queries      from './admin.queries.js'
-import * as userQueries  from '../users/users.queries.js'
+import * as queries  from './admin.queries.js'
+import { findById }  from '../auth/auth.queries.js'
 
 // ── Get sub-admin permissions ──────────────────────────────────────────────
 const getPermissions = async (user_id) => {
@@ -18,14 +18,14 @@ const getPermissions = async (user_id) => {
 const createPermissions = async (created_by, { user_id, can_manage_courses, can_manage_students, can_send_discounts, can_view_payments, can_manage_tests }) => {
 
   // User exists + sub_admin role check
-  const [userRows] = await userQueries.getUserById(user_id)
-  if (!userRows.length) {
+  const user = await findById(user_id)
+  if (!user) {
     const err = new Error('User not found')
     err.statusCode = 404
     throw err
   }
 
-  if (userRows[0].role !== 'sub_admin') {
+  if (user.role !== 'sub_admin') {
     const err = new Error('User is not a sub-admin')
     err.statusCode = 400
     throw err
@@ -41,11 +41,11 @@ const createPermissions = async (created_by, { user_id, can_manage_courses, can_
 
   await queries.createPermissions({
     user_id,
-    can_manage_courses   : can_manage_courses   ?? 0,
-    can_manage_students  : can_manage_students  ?? 0,
-    can_send_discounts   : can_send_discounts   ?? 0,
-    can_view_payments    : can_view_payments    ?? 0,
-    can_manage_tests     : can_manage_tests     ?? 0,
+    can_manage_courses  : can_manage_courses   ?? 0,
+    can_manage_students : can_manage_students  ?? 0,
+    can_send_discounts  : can_send_discounts   ?? 0,
+    can_view_payments   : can_view_payments    ?? 0,
+    can_manage_tests    : can_manage_tests     ?? 0,
     created_by,
   })
 

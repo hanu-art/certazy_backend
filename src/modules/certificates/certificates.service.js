@@ -1,11 +1,11 @@
 // src/modules/certificates/certificates.service.js
 
-import * as queries      from './certificates.queries.js'
-import * as courseQueries from '../courses/courses.queries.js'
-import * as userQueries  from '../users/users.queries.js'
+import * as queries           from './certificates.queries.js'
+import * as courseQueries     from '../courses/courses.queries.js'
+import { findById }           from '../auth/auth.queries.js'
 import { generateCertNumber } from '../../utils/generate.js'
-import { uploadFile }    from '../../utils/upload.js'
-import PDFDocument       from 'pdfkit'
+import { uploadFile }         from '../../utils/upload.js'
+import PDFDocument            from 'pdfkit'
 
 // ── Generate Certificate PDF + Upload ─────────────────────────────────────
 const generateCertPDF = ({ certificate_no, studentName, courseTitle, issuedAt }) => {
@@ -26,8 +26,6 @@ const generateCertPDF = ({ certificate_no, studentName, courseTitle, issuedAt })
           reject(err)
         }
       })
-
-      // ── Certificate Design ─────────────────────────────────────────────
 
       // Background border
       doc
@@ -93,7 +91,7 @@ const generateCertPDF = ({ certificate_no, studentName, courseTitle, issuedAt })
 const issueCertificate = async (user_id, course_id) => {
   // Already issued check
   const [existing] = await queries.getCertificateByUserAndCourse(user_id, course_id)
-  if (existing.length) return existing[0] // Already hai — return karo
+  if (existing.length) return existing[0]
 
   // Course exists + certificate_eligible check
   const [courseRows] = await courseQueries.getCourseById(course_id)
@@ -111,8 +109,12 @@ const issueCertificate = async (user_id, course_id) => {
   }
 
   // Student info fetch karo
-  const [userRows] = await userQueries.getUserById(user_id)
-  const student    = userRows[0]
+  const student = await findById(user_id)
+  if (!student) {
+    const err = new Error('Student not found')
+    err.statusCode = 404
+    throw err
+  }
 
   // Certificate number generate karo
   const certificate_no = generateCertNumber()
@@ -127,7 +129,7 @@ const issueCertificate = async (user_id, course_id) => {
 
   const cert_id = result.insertId
 
-  // PDF generate + S3 upload karo
+  // PDF generate + upload karo
   const { url: pdf_url } = await generateCertPDF({
     certificate_no,
     studentName: student.name,
@@ -158,9 +160,8 @@ const getMyCertificates = async (user_id) => {
 
 // ── Admin — issue certificate manually ────────────────────────────────────
 const adminIssueCertificate = async (admin_id, { user_id, course_id }) => {
-  // Student exists check
-  const [userRows] = await userQueries.getUserById(user_id)
-  if (!userRows.length) {
+  const student = await findById(user_id)
+  if (!student) {
     const err = new Error('Student not found')
     err.statusCode = 404
     throw err
