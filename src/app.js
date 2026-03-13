@@ -22,7 +22,7 @@ import progressRoutes from './modules/progress/progress.routes.js'
 import paymentRoutes from "./modules/payments/payments.routes.js"
 import discountRoutes from "./modules/discounts/discounts.routes.js"
 import certificateRoutes from "./modules/certificates/certificates.routes.js"
-
+import reviewRoutes from "./modules/reviews/reviews.routes.js"
 
 const app = express()
 
@@ -57,18 +57,19 @@ app.get('/health', (req, res) => {
 // ─── ROUTES ──────────────────────────────────────────────────
 app.use('/api/auth', authRoutes)
 app.use("/api/category", categoryRoutes)
- app.use('/api/courses', coursesRoutes)
- app.use('/api/sections', sectionRoutes)
- app.use('/api/lessons', lessonRoutes)
- app.use('/api/tests',     testRoutes)
+app.use('/api/courses', coursesRoutes)
+app.use('/api/sections', sectionRoutes)
+app.use('/api/lessons', lessonRoutes)
+app.use('/api/tests', testRoutes)
 app.use('/api/questions', questionRoutes)
-app.use('/api/options',   optionRoutes)
+app.use('/api/options', optionRoutes)
 app.use('/api/enrollments', enrollmentRoutes)
 app.use('/api/attempts', attemptRoutes)
 app.use('/api/progress', progressRoutes)
 app.use('/api/payments', paymentRoutes)
 app.use('/api/discounts', discountRoutes)
 app.use('/api/certificates', certificateRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 // app.use('/api/admin', adminRoutes)
 
