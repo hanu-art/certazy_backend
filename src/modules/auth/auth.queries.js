@@ -68,6 +68,50 @@ const verifyEmail = async (userId) => {
   await pool.query('UPDATE users SET is_verified = 1 WHERE id = ?', [userId])
 }
 
+// ── Get all students (admin) ───────────────────────────────────────────────
+const getAllUsers = ({ limit, offset, role, search }) => {
+  const conditions = []
+  const values     = []
+
+  if (role)   { conditions.push('role = ?');                    values.push(role) }
+  if (search) { conditions.push('(name LIKE ? OR email LIKE ?)'); values.push(`%${search}%`, `%${search}%`) }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+  values.push(Number(limit), Number(offset))
+
+  return pool.query(
+    `SELECT id, name, email, role, mobile, avatar,
+            is_verified, is_active, created_at
+     FROM users ${where}
+     ORDER BY created_at DESC
+     LIMIT ? OFFSET ?`,
+    values
+  )
+}
+
+// ── Count users ────────────────────────────────────────────────────────────
+const countUsers = ({ role, search }) => {
+  const conditions = []
+  const values     = []
+
+  if (role)   { conditions.push('role = ?');                      values.push(role) }
+  if (search) { conditions.push('(name LIKE ? OR email LIKE ?)'); values.push(`%${search}%`, `%${search}%`) }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+
+  return pool.query(
+    `SELECT COUNT(*) AS total FROM users ${where}`,
+    values
+  )
+}
+
+// ── Update user status ─────────────────────────────────────────────────────
+const updateUserStatus = (id, is_active) =>
+  pool.query(
+    `UPDATE users SET is_active = ? WHERE id = ?`,
+    [is_active, id]
+  )
+
 export {
   findByEmail,
   findById,
@@ -78,4 +122,7 @@ export {
   deleteAllRefreshTokens,
   updatePassword,
   verifyEmail,
+  getAllUsers,
+  countUsers,
+  updateUserStatus,
 }

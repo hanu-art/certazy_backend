@@ -1,8 +1,4 @@
 // src/config/db.js
-// MySQL connection pool — production grade
-// Pool use karo — connection baar baar open/close nahi hoga
-// Multi-user ke liye pool best hai
-
 
 
 import mysql2 from "mysql2/promise"

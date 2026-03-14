@@ -110,4 +110,51 @@ const me = async (req, res, next) => {
   }
 }
 
-export { register, login, refresh, logout, changePassword, googleCallback, githubCallback, me }
+// ── GET /auth/users ────────────────────────────────────────────────────────
+const getAllUsers = async (req, res, next) => {
+  try {
+    const { page, limit, role, search } = req.query
+    const result = await service.getAllUsers({ page, limit, role, search })
+    return success(res, {
+      message   : 'Users fetched',
+      data      : result.users,
+      pagination: result.pagination,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await service.getById(req.params.id)
+    return success(res, { message: 'User fetched', data: { user } })
+  } catch (err) {
+    next(err)
+  }
+}
+
+
+// ── PUT /auth/users/:id/status ─────────────────────────────────────────────
+const updateUserStatus = async (req, res, next) => {
+  try {
+    const user = await service.updateUserStatus(req.params.id, req.body.is_active)
+    return success(res, { message: 'User status updated', data: { user } })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export { 
+  register,
+   login,
+   refresh,
+   logout,
+   changePassword,
+   googleCallback,
+   githubCallback,
+   me,
+   getAllUsers,
+   getUserById,
+   updateUserStatus 
+  }

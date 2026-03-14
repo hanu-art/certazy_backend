@@ -6,6 +6,8 @@ import * as controller from './auth.controller.js'
 import authenticate from '../../middleware/auth.js'
 import { validate, schemas } from '../../middleware/validate.js'
 import { loginLimiter, registerLimiter } from '../../middleware/rateLimit.js'
+import permission from '../../middleware/permission.js' ;
+import role from '../../middleware/role.js' ;
 
 const router = Router()
 
@@ -43,4 +45,9 @@ router.get('/oauth/failure', (req, res) => {
   res.status(401).json({ success: false, message: 'OAuth login failed. Please try again.' })
 })
 
+
+// ─── ADMIN ────────────────────────────────────────────────────
+router.get('/users/all',            authenticate, role('admin', 'sub_admin'), permission('can_manage_students'), controller.getAllUsers)
+router.get('/users/:id',        authenticate, role('admin', 'sub_admin'), permission('can_manage_students'), controller.getUserById)
+router.put('/users/:id/status', authenticate, role('admin'),              controller.updateUserStatus)
 export default router

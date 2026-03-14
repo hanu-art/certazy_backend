@@ -131,6 +131,49 @@ const oauthLogin = async (user) => {
   }
 }
 
+// ── Get all users (admin) ──────────────────────────────────────────────────
+const getAllUsers = async ({ page = 1, limit = 20, role, search } = {}) => {
+  const offset = (page - 1) * limit
+
+  const [rows]  = await queries.getAllUsers({ limit, offset, role, search })
+  const [count] = await queries.countUsers({ role, search })
+
+  return {
+    users     : rows,
+    pagination: {
+      total     : count[0].total,
+      page      : Number(page),
+      limit     : Number(limit),
+      totalPages: Math.ceil(count[0].total / limit),
+    },
+  }
+}
+
+// ── Update user status (admin) ─────────────────────────────────────────────
+const updateUserStatus = async (id, is_active) => {
+  const user = await findById(id)
+  if (!user) {
+    const err = new Error('User not found')
+    err.statusCode = 404
+    throw err
+  }
+
+  await queries.updateUserStatus(id, is_active)
+  return await findById(id)
+}
+
+//get by id 
+const getById = async (id) => {
+  const user = await queries.findById(id)
+  if (!user) {
+    const err = new Error('User not found')
+    err.statusCode = 404
+    throw err
+  }
+  return user
+}
+
+
 // ─── HELPERS ─────────────────────────────────────────────────
 
 const generateTokens = async (user) => {
@@ -149,4 +192,13 @@ const sanitizeUser = (user) => {
   return safeUser
 }
 
-export { register, login, refresh, logout, changePassword, oauthLogin }
+export { register,
+   login, 
+   refresh, 
+   logout, 
+   changePassword, 
+   oauthLogin, 
+   getAllUsers, 
+   updateUserStatus ,
+   getById
+}
