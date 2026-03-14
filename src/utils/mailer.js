@@ -2,7 +2,7 @@
 
 import nodemailer from 'nodemailer'
 import env from '../config/env.js'
-console.log(env.smtp.pass)
+
 const transporter = nodemailer.createTransport({
   host  : env.smtp.host,
   port  : env.smtp.port,
@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 // Startup pe connection verify karo
 transporter.verify((err) => {
   if (err) console.error('Mailer connection failed:', err.message)
-  else     console.log('✅ Mailer ready')
+  else     console.log(' Mailer ready')
 })
 
 // ─── CORE SEND ───────────────────────────────────────────────

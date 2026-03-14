@@ -57,7 +57,7 @@ app.get('/health', (req, res) => {
 
 // ─── ROUTES ──────────────────────────────────────────────────
 app.use('/api/auth', authRoutes)
-app.use("/api/category", categoryRoutes)
+app.use("/api/categories", categoryRoutes)
 app.use('/api/courses', coursesRoutes)
 app.use('/api/sections', sectionRoutes)
 app.use('/api/lessons', lessonRoutes)

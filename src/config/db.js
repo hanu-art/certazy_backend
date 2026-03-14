@@ -32,7 +32,7 @@ const testConnection = async () => {
     conn.release();
   } catch (err) {
     console.error('MySQL connection failed:', err.message);
-    process.exit(1); // DB connect nahi hua toh app band karo
+    process.exit(1);
   }
 };
 
