@@ -1,14 +1,14 @@
 // src/modules/courses/courses.controller.js
 
 import * as service from './courses.service.js'
-import { success } from '../../utils/response.js'
+import { success }  from '../../utils/response.js'
 
 const getAllCourses = async (req, res, next) => {
   try {
-    const { page, limit, status, category_id, level, is_featured, search } = req.query
+    const { page, limit, status, category_id, level, is_featured, search, sortBy, sortOrder } = req.query
 
-    const result = await service.getAllCourses({ page, limit, status, category_id, level, is_featured, search })
- 
+    const result = await service.getAllCourses({ page, limit, status, category_id, level, is_featured, search, sortBy, sortOrder })
+
     return success(res, { message: 'Courses fetched', data: result.courses, pagination: result.pagination })
   } catch (err) {
     next(err)
@@ -51,10 +51,10 @@ const deleteCourse = async (req, res, next) => {
   }
 }
 
-export { 
-    getAllCourses, 
-    getCourseBySlug, 
-    createCourse, 
-    updateCourse, 
-    deleteCourse 
+export {
+  getAllCourses,
+  getCourseBySlug,
+  createCourse,
+  updateCourse,
+  deleteCourse
 }

@@ -7,21 +7,31 @@ import * as cache from '../../utils/cache.js'
 const CACHE_KEY = 'categories:all'
 const CACHE_TTL = 60 * 60   // 1 hour
 
-// ── Get all active categories ──────────────────────────────────────────────
+// ── Get all active categories — nested parent → children ──────────────────
 const getAllCategories = async () => {
   // Check cache first
   const cached = await cache.get(CACHE_KEY)
   if (cached) return cached
-
-  // DB se fetch karo
+ 
+  // DB se fetch karo — flat list
   const [rows] = await queries.getAllCategories()
-
+ 
+  // Flat list → nested structure
+  // Parent categories (parent_id = null) + unke children
+  const parents  = rows.filter(row => row.parent_id === null)
+  const children = rows.filter(row => row.parent_id !== null)
+ 
+  const nested = parents.map(parent => ({
+    ...parent,
+    children: children.filter(child => child.parent_id === parent.id)
+  }))
+ 
   // Cache mein save karo
-  await cache.set(CACHE_KEY, rows, CACHE_TTL)
-
-  return rows
+  await cache.set(CACHE_KEY, nested, CACHE_TTL)
+ 
+  return nested
 }
-
+ 
 // ── Get single category by ID ──────────────────────────────────────────────
 const getCategoryById = async (id) => {
   const [rows] = await queries.getCategoryById(id)
@@ -32,6 +42,7 @@ const getCategoryById = async (id) => {
   }
   return rows[0]
 }
+ 
 
 // ── Get single category by slug ────────────────────────────────────────────
 const getCategoryBySlug = async (slug) => {

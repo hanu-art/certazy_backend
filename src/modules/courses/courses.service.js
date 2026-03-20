@@ -1,22 +1,21 @@
 // src/modules/courses/courses.service.js
 
-import slugify from 'slugify'
+import slugify      from 'slugify'
 import * as queries from './courses.queries.js'
 import * as cache   from '../../utils/cache.js'
 
-const CACHE_TTL_LIST   = 60 * 10    // 10 min
-const CACHE_TTL_SINGLE = 60 * 15    // 15 min
-const CACHE_TTL_FEATURED = 60 * 30  // 30 min
+const CACHE_TTL_LIST   = 60 * 10  // 10 min
+const CACHE_TTL_SINGLE = 60 * 15  // 15 min
 
-// ── Get all courses (filters + pagination) ─────────────────────────────────
-const getAllCourses = async ({ page = 1, limit = 12, status, category_id, level, is_featured, search } = {}) => {
+// ── Get all courses (filters + pagination + sorting) ───────────────────────
+const getAllCourses = async ({ page = 1, limit = 12, status, category_id, level, is_featured, search, sortBy = 'created_at', sortOrder = 'DESC' } = {}) => {
   const offset   = (page - 1) * limit
-  const cacheKey = `courses:list:p${page}:l${limit}:s${status}:c${category_id}:lv${level}:f${is_featured}:q${search}`
+  const cacheKey = `courses:list:p${page}:l${limit}:s${status}:c${category_id}:lv${level}:f${is_featured}:q${search}:sb${sortBy}:so${sortOrder}`
 
   const cached = await cache.get(cacheKey)
   if (cached) return cached
 
-  const [rows]  = await queries.getAllCourses({ limit, offset, status, category_id, level, is_featured, search })
+  const [rows]  = await queries.getAllCourses({ limit, offset, status, category_id, level, is_featured, search, sortBy, sortOrder })
   const [count] = await queries.countCourses({ status, category_id, level, is_featured, search })
 
   const total = count[0].total
@@ -24,8 +23,8 @@ const getAllCourses = async ({ page = 1, limit = 12, status, category_id, level,
     courses   : rows,
     pagination: {
       total,
-      page     : Number(page),
-      limit    : Number(limit),
+      page      : Number(page),
+      limit     : Number(limit),
       totalPages: Math.ceil(total / limit),
     },
   }
@@ -73,7 +72,6 @@ const createCourse = async (body, createdBy) => {
     ? slugify(slug, { lower: true, strict: true })
     : slugify(title, { lower: true, strict: true })
 
-  // Duplicate slug check
   const [slugCheck] = await queries.checkSlugExists(finalSlug)
   if (slugCheck.length) {
     const err = new Error('Slug already exists — use a different title or slug')
@@ -81,7 +79,6 @@ const createCourse = async (body, createdBy) => {
     throw err
   }
 
-  // Category valid check
   const [catCheck] = await queries.checkCategoryExists(category_id)
   if (!catCheck.length) {
     const err = new Error('Category not found or inactive')
@@ -97,10 +94,7 @@ const createCourse = async (body, createdBy) => {
   })
 
   const course = await getCourseById(result.insertId)
-
-  // Invalidate list cache
   await cache.delByPattern('courses:list:*')
-
   return course
 }
 
@@ -108,7 +102,6 @@ const createCourse = async (body, createdBy) => {
 const updateCourse = async (id, body) => {
   const current = await getCourseById(id)
 
-  // Merge
   const title               = body.title               ?? current.title
   const slug                = body.slug                ?? current.slug
   const description         = body.description         ?? current.description
@@ -125,7 +118,6 @@ const updateCourse = async (id, body) => {
   const what_you_learn      = body.what_you_learn      ?? current.what_you_learn
   const certificate_eligible= body.certificate_eligible?? current.certificate_eligible
 
-  // Slug change check
   const finalSlug = slugify(slug, { lower: true, strict: true })
   if (finalSlug !== current.slug) {
     const [slugCheck] = await queries.checkSlugExists(finalSlug, id)
@@ -136,7 +128,6 @@ const updateCourse = async (id, body) => {
     }
   }
 
-  // Category change check
   if (category_id !== current.category_id) {
     const [catCheck] = await queries.checkCategoryExists(category_id)
     if (!catCheck.length) {
@@ -152,7 +143,6 @@ const updateCourse = async (id, body) => {
     status, is_featured, requirements, what_you_learn, certificate_eligible
   })
 
-  // Invalidate caches
   await cache.delByPattern('courses:list:*')
   await cache.del(`course:slug:${current.slug}`)
   if (finalSlug !== current.slug) await cache.del(`course:slug:${finalSlug}`)
@@ -164,7 +154,6 @@ const updateCourse = async (id, body) => {
 const deleteCourse = async (id) => {
   const current = await getCourseById(id)
 
-  // Block if has enrollments
   const [enrollments] = await queries.hasEnrollments(id)
   if (enrollments.length) {
     const err = new Error('Cannot delete — course has active enrollments')
@@ -173,17 +162,15 @@ const deleteCourse = async (id) => {
   }
 
   await queries.deleteCourseById(id)
-
-  // Invalidate caches
   await cache.delByPattern('courses:list:*')
   await cache.del(`course:slug:${current.slug}`)
 }
 
-export { 
-    getAllCourses, 
-    getCourseBySlug, 
-    getCourseById, 
-    createCourse, 
-    updateCourse, 
-    deleteCourse 
+export {
+  getAllCourses,
+  getCourseBySlug,
+  getCourseById,
+  createCourse,
+  updateCourse,
+  deleteCourse
 }

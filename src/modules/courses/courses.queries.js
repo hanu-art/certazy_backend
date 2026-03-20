@@ -2,8 +2,12 @@
 
 import { pool } from "../../config/db.js";
 
-// ── Get all published courses (with filters + pagination) ──────────────────
-const getAllCourses = ({ limit, offset, status, category_id, level, is_featured, search }) => {
+// ── Allowed sort fields — SQL injection se bachao ──────────────────────────
+const ALLOWED_SORT   = ['price', 'created_at', 'rating_avg', 'enrolled_count', 'title']
+const ALLOWED_ORDER  = ['ASC', 'DESC']
+
+// ── Get all published courses (with filters + pagination + sorting) ─────────
+const getAllCourses = ({ limit, offset, status, category_id, level, is_featured, search, sortBy = 'created_at', sortOrder = 'DESC' }) => {
   const conditions = []
   const values     = []
 
@@ -21,6 +25,10 @@ const getAllCourses = ({ limit, offset, status, category_id, level, is_featured,
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
 
+  // SQL injection se bachao — whitelist check
+  const finalSort  = ALLOWED_SORT.includes(sortBy)    ? `c.${sortBy}`  : 'c.created_at'
+  const finalOrder = ALLOWED_ORDER.includes(sortOrder?.toUpperCase()) ? sortOrder.toUpperCase() : 'DESC'
+
   values.push(Number(limit), Number(offset))
 
   return pool.query(
@@ -36,7 +44,7 @@ const getAllCourses = ({ limit, offset, status, category_id, level, is_featured,
      LEFT JOIN categories cat ON cat.id = c.category_id
      LEFT JOIN users u ON u.id = c.created_by
      ${where}
-     ORDER BY c.created_at DESC
+     ORDER BY ${finalSort} ${finalOrder}
      LIMIT ? OFFSET ?`,
     values
   )
@@ -118,7 +126,7 @@ const checkCategoryExists = (category_id) =>
     [category_id]
   )
 
-  // ── Check if course exists and not archived ────────────────────────────────
+// ── Check if course exists and not archived ────────────────────────────────
 const checkCourseExists = (course_id) =>
   pool.query(
     "SELECT id FROM courses WHERE id = ? AND status != 'archived' LIMIT 1",
