@@ -9,6 +9,7 @@ import * as courseQueries          from '../courses/courses.queries.js'
 import { createEnrollment }        from '../enrollments/enrollments.service.js'
 import { generateInvoice }         from '../../utils/invoice.js'
 import { generateInvoiceNumber }   from '../../utils/generate.js'
+import { convertUSDtoINR }        from '../../utils/currency.js'
 import { sendInvoiceJob }          from '../../jobs/emailQueue.js'
 import { markDiscountUsed }        from '../discounts/discounts.service.js'
 
@@ -104,8 +105,9 @@ const razorpayCreateOrder = async (user_id, { course_id, discount_link_id, disco
   }
   const course = courseRows[0]
 
-  const amount          = discounted_amount ?? course.price
   const original_amount = course.price
+  const usdAmount       = discounted_amount ?? course.price
+  const amount          = await convertUSDtoINR(usdAmount)
 
   const order = await razorpay.orders.create({
     amount  : Math.round(amount * 100),
@@ -174,10 +176,10 @@ const paypalCreateOrder = async (user_id, { course_id, discount_link_id, discoun
   }
   const course = courseRows[0]
 
-  const amount          = discounted_amount ?? course.price
   const original_amount = course.price
+  const amount          = discounted_amount ?? course.price
 
-  const { body: order } = await ordersController.ordersCreate({
+  const { result: order } = await ordersController.createOrder({
     body: {
       intent       : CheckoutPaymentIntent.Capture,
       purchaseUnits: [{
@@ -215,11 +217,11 @@ const paypalCapture = async (user, { payment_id, paypal_order_id }) => {
 
   let captureData
   try {
-    const { body } = await ordersController.ordersCapture({
+    const { result } = await ordersController.captureOrder({
       id    : paypal_order_id,
       prefer: 'return=minimal',
     })
-    captureData = body
+    captureData = result
   } catch (err) {
     await queries.markPaymentFailed(payment_id)
     const error = new Error('PayPal payment capture failed')

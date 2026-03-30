@@ -8,7 +8,7 @@ import env from '../../config/env.js'
 const cookieOptions = {
   httpOnly: true,
   secure  : env.isProd,
-  sameSite: 'strict',
+  sameSite: env.isProd ? 'strict' : 'lax',
 }
 
 const setCookies = (res, { accessToken, refreshToken }) => {
