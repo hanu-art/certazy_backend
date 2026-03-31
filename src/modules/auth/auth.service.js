@@ -162,6 +162,12 @@ const updateUserStatus = async (id, is_active) => {
   return await findById(id)
 }
 
+const updateProfile = async (userId, { name, mobile, gender }) => {
+  await queries.updateProfile(userId, { name, mobile, gender })
+  const user = await queries.findById(userId)
+  return { user }
+}
+
 //get by id 
 const getById = async (id) => {
   const user = await queries.findById(id)
@@ -200,5 +206,6 @@ export { register,
    oauthLogin, 
    getAllUsers, 
    updateUserStatus ,
+   updateProfile,
    getById
 }

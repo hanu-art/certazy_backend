@@ -18,6 +18,7 @@ router.post('/refresh',                                                controlle
 router.post('/logout',                                                 controller.logout)
 
 router.post('/change-password', authenticate, validate(schemas.changePassword), controller.changePassword)
+router.put('/profile', authenticate, controller.updateProfile)
 router.get('/me', authenticate, controller.me)
 
 // ─── GOOGLE OAuth ────────────────────────────────────────────
