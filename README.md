@@ -1,4 +1,4 @@
-# 🎓 EduPlatform — Online Learning & Certification System
+# 🎓 Certazy — Online Learning & Certification System
 
 <div align="center">
 
@@ -38,7 +38,7 @@ Courses · Practice Tests · Certifications · Subscriptions · Discount Links �
 
 ## 🧭 Overview
 
-EduPlatform is a full-featured online learning and certification backend — similar to Whizlabs, Simplilearn, and CompTIA. It supports:
+Certazy is a full-featured online learning and certification backend — similar to Whizlabs, Simplilearn, and CompTIA. It supports:
 
 - Students purchasing and consuming courses
 - Admins managing content, users, and sub-admins
@@ -313,6 +313,7 @@ const user = await findUserByEmail(email);
 | 19 | `certificates` | Course completion certificates |
 | 20 | `reviews` | Course ratings and comments |
 | 21 | `notifications` | In-app alerts |
+| 22 | `contacts` | User and guest contact queries |
 
 **Import schema:**
 ```bash
@@ -325,8 +326,8 @@ mysql -u root -p your_database_name < schema.sql
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/your-username/eduplatform-backend.git
-cd eduplatform-backend
+git clone https://github.com/your-username/certazy-backend.git
+cd certazy-backend
 
 # 2. Install dependencies
 npm install
@@ -357,7 +358,7 @@ NODE_ENV=development
 # ── Database ───────────────────────────
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=eduplatform
+DB_NAME=certazy
 DB_USER=root
 DB_PASSWORD=yourpassword
 DB_POOL_MIN=5
@@ -378,14 +379,14 @@ REDIS_PASSWORD=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_REGION=ap-south-1
-AWS_BUCKET_NAME=eduplatform-bucket
+AWS_BUCKET_NAME=certazy-bucket
 
 # ── Email ──────────────────────────────
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your@gmail.com
 SMTP_PASS=your_app_password
-MAIL_FROM="EduPlatform <noreply@eduplatform.com>"
+MAIL_FROM="Certazy <noreply@certazy.com>"
 
 # ── Payment ────────────────────────────
 RAZORPAY_KEY_ID=
@@ -401,62 +402,70 @@ FRONTEND_URL=http://localhost:3000
 
 ### Auth
 ```
-POST   /api/auth/register              Student registration
-POST   /api/auth/login                 Login (all roles)
-POST   /api/auth/refresh               Refresh access token
-POST   /api/auth/logout                Logout
-POST   /api/auth/change-password       First login password change
+POST   /api/v1/auth/register              Student registration
+POST   /api/v1/auth/login                 Login (all roles)
+POST   /api/v1/auth/refresh               Refresh access token
+POST   /api/v1/auth/logout                Logout
+POST   /api/v1/auth/change-password       First login password change
 ```
 
 ### Admin
 ```
-POST   /api/admin/sub-admins           Create sub-admin
-GET    /api/admin/sub-admins           List all sub-admins
-PUT    /api/admin/sub-admins/:id       Update permissions
-DELETE /api/admin/sub-admins/:id       Remove sub-admin
-GET    /api/admin/dashboard            Stats overview
+POST   /api/v1/admin/sub-admins           Create sub-admin
+GET    /api/v1/admin/sub-admins           List all sub-admins
+PUT    /api/v1/admin/sub-admins/:id       Update permissions
+DELETE /api/v1/admin/sub-admins/:id       Remove sub-admin
+GET    /api/v1/admin/dashboard            Stats overview
 ```
 
 ### Courses
 ```
-GET    /api/courses                    List all (with filters + search)
-GET    /api/courses/:slug              Single course detail
-POST   /api/courses                    Create (admin)
-PUT    /api/courses/:id                Update (admin)
-DELETE /api/courses/:id                Delete (admin)
+GET    /api/v1/courses                    List all (with filters + search)
+GET    /api/v1/courses/:slug              Single course detail
+POST   /api/v1/courses                    Create (admin)
+PUT    /api/v1/courses/:id                Update (admin)
+DELETE /api/v1/courses/:id                Delete (admin)
 ```
 
 ### Tests
 ```
-GET    /api/tests/:id                  Test detail + questions
-POST   /api/tests                      Create test (admin)
-POST   /api/tests/:id/attempts         Submit attempt
-GET    /api/tests/:id/attempts         My attempt history
+GET    /api/v1/tests/:id                  Test detail + questions
+POST   /api/v1/tests                      Create test (admin)
+POST   /api/v1/tests/:id/attempts         Submit attempt
+GET    /api/v1/tests/:id/attempts         My attempt history
 ```
 
 ### Payments
 ```
-POST   /api/payments/create-order      Create payment order
-POST   /api/payments/verify            Verify & confirm payment
-POST   /api/payments/webhook           Payment gateway webhook
-GET    /api/payments/history           My payment history
+POST   /api/v1/payments/create-order      Create payment order
+POST   /api/v1/payments/verify            Verify & confirm payment
+POST   /api/v1/payments/webhook           Payment gateway webhook
+GET    /api/v1/payments/history           My payment history
 ```
 
 ### Discounts
 ```
-POST   /api/discounts                  Create discount link (admin)
-GET    /api/discounts/verify/:token    Verify token before checkout
-GET    /api/discounts                  List all discount links (admin)
+POST   /api/v1/discounts                  Create discount link (admin)
+GET    /api/v1/discounts/verify/:token    Verify token before checkout
+GET    /api/v1/discounts                  List all discount links (admin)
 ```
 
 ### Others
 ```
-GET    /api/enrollments                My enrolled courses
-POST   /api/progress                   Update lesson progress
-GET    /api/certificates               My certificates
-POST   /api/reviews                    Submit review
-GET    /api/notifications              My notifications
-PUT    /api/notifications/read         Mark as read
+GET    /api/v1/enrollments                My enrolled courses
+POST   /api/v1/progress                   Update lesson progress
+GET    /api/v1/certificates               My certificates
+POST   /api/v1/reviews                    Submit review
+GET    /api/v1/notifications              My notifications
+PUT    /api/v1/notifications/read         Mark as read
+```
+
+### Contact
+```text
+GET    /api/v1/contact                    List all messages (admin)
+GET    /api/v1/contact/:id                Get specific message (admin)
+POST   /api/v1/contact/create             Submit a new message
+PUT    /api/v1/contact/:id/status         Update message status (admin)
 ```
 
 ---
@@ -514,7 +523,7 @@ POST /auth/logout
 ```
 1. Admin → Dashboard → Select student + course
 2. Set discount price + expiry hours
-3. POST /api/discounts → UUID token generated
+3. POST /api/v1/discounts → UUID token generated
 4. Email sent to student:
    ──────────────────────────────────
    Special Offer for You!
@@ -524,11 +533,11 @@ POST /auth/logout
    [Claim Offer] → /checkout?token=UUID
    ──────────────────────────────────
 5. Student clicks link
-6. GET /api/discounts/verify/:token
+6. GET /api/v1/discounts/verify/:token
    → Check: valid? not used? not expired?
    → Return course + discounted price
 7. Student pays discounted amount
-8. POST /api/payments/verify
+8. POST /api/v1/payments/verify
    → Mark token as used (is_used = 1)
    → Create enrollment
    → Generate invoice PDF → S3
@@ -540,13 +549,13 @@ POST /auth/logout
 ## 💳 Payment Flow
 
 ```
-1. POST /api/payments/create-order
+1. POST /api/v1/payments/create-order
    → Create order on Razorpay
    → Save as pending in payments table
 
 2. Student completes payment on frontend
 
-3. POST /api/payments/verify
+3. POST /api/v1/payments/verify
    → Verify payment signature
    → Update status → success
    → Create enrollment record
@@ -554,7 +563,7 @@ POST /auth/logout
    → Generate invoice PDF → email
    → Create notification
 
-4. POST /api/payments/webhook (backup)
+4. POST /api/v1/payments/webhook (backup)
    → Razorpay sends webhook on success
    → Same flow (idempotent check)
 ```
