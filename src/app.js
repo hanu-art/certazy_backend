@@ -25,6 +25,7 @@ import certificateRoutes from "./modules/certificates/certificates.routes.js"
 import reviewRoutes from "./modules/reviews/reviews.routes.js"
 import adminRoutes from "./modules/admin/admin.routes.js"
 import contactRoutes from "./modules/contact/contact.routes.js"
+import uploadRoutes from "./modules/upload/upload.routes.js"
 
 const app = express()
 
@@ -74,6 +75,7 @@ app.use('/api/v1/certificates', certificateRoutes)
 app.use('/api/v1/reviews', reviewRoutes)
 app.use('/api/v1/admin', adminRoutes)
 app.use("/api/v1/contact", contactRoutes)
+app.use('/api/v1/upload', uploadRoutes)
 
 // ─── 404 ─────────────────────────────────────────────────────
 app.use((req, res) => {

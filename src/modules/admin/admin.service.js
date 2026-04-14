@@ -1,7 +1,8 @@
 // src/modules/admin/admin.service.js
 
 import * as queries  from './admin.queries.js'
-import { findById }  from '../auth/auth.queries.js'
+import { findById, findByEmail, createUser }  from '../auth/auth.queries.js'
+import bcrypt from 'bcryptjs'
 
 // ── Get sub-admin permissions ──────────────────────────────────────────────
 const getPermissions = async (user_id) => {
@@ -78,9 +79,41 @@ const deletePermissions = async (user_id) => {
   await queries.deletePermissions(user_id)
 }
 
+// ── Create Sub-Admin Account + Permissions ─────────────────────────────────
+const createSubAdmin = async (created_by, body) => {
+  const { name, email, password, can_manage_courses, can_manage_students, can_send_discounts, can_view_payments, can_manage_tests } = body
+
+  const existing = await findByEmail(email)
+  if (existing) {
+    const err = new Error('Email already registered')
+    err.statusCode = 409
+    throw err
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12)
+  const user_id = await createUser({ name, email, password: hashedPassword, role: 'sub_admin' })
+
+  await queries.createPermissions({
+    user_id,
+    can_manage_courses  : can_manage_courses   ?? 0,
+    can_manage_students : can_manage_students  ?? 0,
+    can_send_discounts  : can_send_discounts   ?? 0,
+    can_view_payments   : can_view_payments    ?? 0,
+    can_manage_tests    : can_manage_tests     ?? 0,
+    created_by,
+  })
+
+  // Returning user auth obj merged with permissions
+  const user = await findById(user_id)
+  const permissions = await getPermissions(user_id)
+  
+  return { user, permissions }
+}
+
 export {
   getPermissions,
   createPermissions,
   updatePermissions,
   deletePermissions,
+  createSubAdmin,
 }

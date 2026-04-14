@@ -1,26 +1,23 @@
 // src/utils/upload.js
 
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import env from '../config/env.js'
 
 // ─── S3 CLIENT SETUP ─────────────────────────────────────────────────────
-// DigitalOcean Spaces endpoint use kar rahe hain
-// AWS S3 use karna ho to endpoint hatao aur region 'ap-south-1' ya apna region dalo
+// Migrated to exact AWS S3 infrastructure
 const s3 = new S3Client({
-  endpoint      : `https://${env.spaces.region}.digitaloceanspaces.com`, // DigitalOcean Spaces
-  // endpoint   : `https://s3.amazonaws.com`                             // AWS S3
-  region        : env.spaces.region,
+  region        : env.s3.region,
   credentials   : {
-    accessKeyId    : env.spaces.accessKey,
-    secretAccessKey: env.spaces.secretKey,
+    accessKeyId    : env.s3.accessKey,
+    secretAccessKey: env.s3.secretKey,
   },
-  forcePathStyle: false, // DigitalOcean ke liye false rakhna
 })
 
-// ── Upload file to Spaces/S3 ───────────────────────────────────────────────
+// ── Upload file to S3 ───────────────────────────────────────────────
 const uploadFile = async ({ buffer, key, mimeType, isPublic = true }) => {
   const command = new PutObjectCommand({
-    Bucket     : env.spaces.bucket,
+    Bucket     : env.s3.bucket,
     Key        : key,
     Body       : buffer,
     ContentType: mimeType,
@@ -29,21 +26,37 @@ const uploadFile = async ({ buffer, key, mimeType, isPublic = true }) => {
 
   await s3.send(command)
 
-  // DigitalOcean Spaces public URL
-  // AWS S3 URL format: https://{bucket}.s3.{region}.amazonaws.com/{key}
-  const url = `https://${env.spaces.bucket}.${env.spaces.region}.digitaloceanspaces.com/${key}`
+  // AWS S3 public URL format
+  const url = `https://${env.s3.bucket}.s3.${env.s3.region}.amazonaws.com/${key}`
 
   return url
 }
 
-// ── Delete file from Spaces/S3 ─────────────────────────────────────────────
 const deleteFile = async (key) => {
   const command = new DeleteObjectCommand({
-    Bucket: env.spaces.bucket,
+    Bucket: env.s3.bucket,
     Key   : key,
   })
 
   await s3.send(command)
 }
 
-export { uploadFile, deleteFile }
+// ── Generate Pre-Signed URL for Frontend Upload ────────────────────────────
+const generatePresignedUrl = async ({ key, mimeType, isPublic = true, expiresIn = 300 }) => {
+  const command = new PutObjectCommand({
+    Bucket     : env.s3.bucket,
+    Key        : key,
+    ContentType: mimeType,
+    ACL        : isPublic ? 'public-read' : 'private',
+  })
+
+  // Generate URL that expires in 5 minutes
+  const signedUrl = await getSignedUrl(s3, command, { expiresIn })
+  
+  // Public AWS S3 URL where file will be accessible after upload
+  const fileUrl = `https://${env.s3.bucket}.s3.${env.s3.region}.amazonaws.com/${key}`
+
+  return { signedUrl, fileUrl }
+}
+
+export { uploadFile, deleteFile, generatePresignedUrl }

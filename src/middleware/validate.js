@@ -207,8 +207,32 @@ const updateOptionSchema = Joi.object({
   order_num  : Joi.number().integer().optional(),
 })
 
+const createSubAdminSchema = Joi.object({
+  name    : Joi.string().min(2).max(100).required(),
+  email   : Joi.string().email().max(150).lowercase().required(),
+  password: Joi.string()
+    .min(8)
+    .max(72)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .required()
+    .messages({
+      'string.pattern.base': 'Password must have uppercase, lowercase, number and special character',
+    }),
+  can_manage_courses : Joi.number().integer().valid(0,1).optional(),
+  can_manage_students: Joi.number().integer().valid(0,1).optional(),
+  can_send_discounts : Joi.number().integer().valid(0,1).optional(),
+  can_view_payments  : Joi.number().integer().valid(0,1).optional(),
+  can_manage_tests   : Joi.number().integer().valid(0,1).optional(),
+})
+
 const schemas = {
   register      : registerSchema,
+  createSubAdmin: createSubAdminSchema,
+  generatePresignedUrl: Joi.object({
+    fileName: Joi.string().required().max(200),
+    fileType: Joi.string().required().max(50),
+    isPublic: Joi.boolean().optional().default(true),
+  }),
   login         : loginSchema,
   changePassword: changePasswordSchema,
   createCategory  : createCategorySchema,

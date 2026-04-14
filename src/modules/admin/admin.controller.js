@@ -43,4 +43,14 @@ const deletePermissions = async (req, res, next) => {
   }
 }
 
-export { getPermissions, createPermissions, updatePermissions, deletePermissions }
+// ── POST /admin/sub-admins/create ─────────────────────────────────────────
+const createSubAdmin = async (req, res, next) => {
+  try {
+    const data = await service.createSubAdmin(req.user.id, req.body)
+    return success(res, { statusCode: 201, message: 'Sub-admin created successfully', data })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export { getPermissions, createPermissions, updatePermissions, deletePermissions, createSubAdmin }

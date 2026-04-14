@@ -16,9 +16,9 @@ const register = async ({ name, email, password }) => {
 
   const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS)
   const userId = await queries.createUser({ name, email, password: hashedPassword })
-  const user = await queries.findById(userId) 
+  const user = await queries.findById(userId)
 
-   sendWelcomeJob({ to: email, name }) // fire and forget
+  sendWelcomeJob({ to: email, name }) // fire and forget
   return user
 }
 
@@ -52,7 +52,7 @@ const login = async ({ email, password }) => {
   const tokens = await generateTokens(user)
 
   return {
-    user        : sanitizeUser(user),
+    user: sanitizeUser(user),
     ...tokens,
     isFirstLogin: user.is_first_login === 1,
   }
@@ -125,7 +125,7 @@ const changePassword = async ({ userId, currentPassword, newPassword }) => {
 const oauthLogin = async (user) => {
   const tokens = await generateTokens(user)
   return {
-    user        : sanitizeUser(user),
+    user: sanitizeUser(user),
     ...tokens,
     isFirstLogin: false,
   }
@@ -135,15 +135,15 @@ const oauthLogin = async (user) => {
 const getAllUsers = async ({ page = 1, limit = 20, role, search } = {}) => {
   const offset = (page - 1) * limit
 
-  const [rows]  = await queries.getAllUsers({ limit, offset, role, search })
+  const [rows] = await queries.getAllUsers({ limit, offset, role, search })
   const [count] = await queries.countUsers({ role, search })
 
   return {
-    users     : rows,
+    users: rows,
     pagination: {
-      total     : count[0].total,
-      page      : Number(page),
-      limit     : Number(limit),
+      total: count[0].total,
+      page: Number(page),
+      limit: Number(limit),
       totalPages: Math.ceil(count[0].total / limit),
     },
   }
@@ -151,7 +151,7 @@ const getAllUsers = async ({ page = 1, limit = 20, role, search } = {}) => {
 
 // ── Update user status (admin) ─────────────────────────────────────────────
 const updateUserStatus = async (id, is_active) => {
-  const user = await findById(id)
+  const user = await queries.findById(id)
   if (!user) {
     const err = new Error('User not found')
     err.statusCode = 404
@@ -159,7 +159,7 @@ const updateUserStatus = async (id, is_active) => {
   }
 
   await queries.updateUserStatus(id, is_active)
-  return await findById(id)
+  return await queries.findById(id)
 }
 
 const updateProfile = async (userId, { name, mobile, gender }) => {
@@ -185,9 +185,9 @@ const getById = async (id) => {
 const generateTokens = async (user) => {
   const payload = { id: user.id, role: user.role }
 
-  const accessToken  = tokenUtil.generateAccessToken(payload)
+  const accessToken = tokenUtil.generateAccessToken(payload)
   const refreshToken = tokenUtil.generateRefreshToken(payload)
-  const expiresAt    = tokenUtil.getRefreshTokenExpiry()
+  const expiresAt = tokenUtil.getRefreshTokenExpiry()
 
   await queries.saveRefreshToken({ userId: user.id, token: refreshToken, expiresAt })
   return { accessToken, refreshToken }
@@ -198,14 +198,15 @@ const sanitizeUser = (user) => {
   return safeUser
 }
 
-export { register,
-   login, 
-   refresh, 
-   logout, 
-   changePassword, 
-   oauthLogin, 
-   getAllUsers, 
-   updateUserStatus ,
-   updateProfile,
-   getById
+export {
+  register,
+  login,
+  refresh,
+  logout,
+  changePassword,
+  oauthLogin,
+  getAllUsers,
+  updateUserStatus,
+  updateProfile,
+  getById
 }
