@@ -7,7 +7,7 @@ import env from '../../config/env.js'
 
 const cookieOptions = {
   httpOnly: true,
-  secure  : env.isProd,
+  secure: env.isProd,
   sameSite: env.isProd ? 'strict' : 'lax',
 }
 
@@ -21,6 +21,7 @@ const setCookies = (res, { accessToken, refreshToken }) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,    // 7 days
   })
 }
+
 
 const register = async (req, res, next) => {
   try {
@@ -39,7 +40,7 @@ const login = async (req, res, next) => {
     setCookies(res, result)
     return success(res, {
       message: 'Login successful',
-      data   : { user: result.user, isFirstLogin: result.isFirstLogin },
+      data: { user: result.user, isFirstLogin: result.isFirstLogin, accessToken: result.accessToken },
     })
   } catch (err) {
     next(err)
@@ -51,7 +52,10 @@ const refresh = async (req, res, next) => {
     const refreshToken = req.cookies?.refreshToken
     const tokens = await service.refresh(refreshToken)
     setCookies(res, tokens)
-    return success(res, { message: 'Token refreshed' })
+    return success(res, {
+      message: 'Token refreshed',
+      data: { accessToken: tokens.accessToken },
+    })
   } catch (err) {
     next(err)
   }
@@ -93,6 +97,9 @@ const updateProfile = async (req, res, next) => {
 
 const googleCallback = async (req, res, next) => {
   try {
+    if (req.user?.isNewUser) {
+      return res.redirect(`${env.frontendUrl}/login`)
+    }
     const result = await service.oauthLogin(req.user)
     setCookies(res, result)
     return res.redirect(`${env.frontendUrl}/oauth/callback`)
@@ -103,6 +110,9 @@ const googleCallback = async (req, res, next) => {
 
 const githubCallback = async (req, res, next) => {
   try {
+    if (req.user?.isNewUser) {
+      return res.redirect(`${env.frontendUrl}/login`)
+    }
     const result = await service.oauthLogin(req.user)
     setCookies(res, result)
     return res.redirect(`${env.frontendUrl}/oauth/callback`)
@@ -126,8 +136,8 @@ const getAllUsers = async (req, res, next) => {
     const { page, limit, role, search } = req.query
     const result = await service.getAllUsers({ page, limit, role, search })
     return success(res, {
-      message   : 'Users fetched',
-      data      : result.users,
+      message: 'Users fetched',
+      data: result.users,
       pagination: result.pagination,
     })
   } catch (err) {
@@ -155,17 +165,17 @@ const updateUserStatus = async (req, res, next) => {
   }
 }
 
-export { 
+export {
   register,
-   login,
-   refresh,
-   logout,
-   changePassword,
+  login,
+  refresh,
+  logout,
+  changePassword,
   updateProfile,
-   googleCallback,
-   githubCallback,
-   me,
-   getAllUsers,
-   getUserById,
-   updateUserStatus 
-  }
+  googleCallback,
+  githubCallback,
+  me,
+  getAllUsers,
+  getUserById,
+  updateUserStatus
+}

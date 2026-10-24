@@ -110,10 +110,16 @@ const createSubAdmin = async (created_by, body) => {
   return { user, permissions }
 }
 
+// ── Get Dashboard Stats ───────────────────────────────────────────────────
+const getDashboardStats = async () => {
+  return await queries.getDashboardStats()
+}
+
 export {
   getPermissions,
   createPermissions,
   updatePermissions,
   deletePermissions,
   createSubAdmin,
+  getDashboardStats,
 }

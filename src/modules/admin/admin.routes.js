@@ -8,6 +8,10 @@ import { validate, schemas } from '../../middleware/validate.js'
 
 const router = Router()
 
+// ─── DASHBOARD & STATS ─────────────────────────────────────────
+router.get('/dashboard', authenticate, role('admin', 'sub_admin'), controller.getDashboardStats)
+router.get('/stats',     authenticate, role('admin', 'sub_admin'), controller.getDashboardStats)
+
 // ─── ADMIN ONLY ───────────────────────────────────────────────
 router.get('/permissions/:userId',    authenticate, role('admin'), controller.getPermissions)
 router.post('/permissions',           authenticate, role('admin'), controller.createPermissions)
