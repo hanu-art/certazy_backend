@@ -312,6 +312,11 @@ const getAllPayments = async ({ page = 1, limit = 20, status } = {}) => {
   }
 }
 
+// ── Admin — Revenue Stats ──────────────────────────────────────────────────
+const getRevenueStats = async () => {
+  return await queries.getRevenueStats()
+}
+
 export {
   razorpayCreateOrder,
   razorpayVerify,
@@ -320,4 +325,5 @@ export {
   paypalCapture,
   getMyPayments,
   getAllPayments,
+  getRevenueStats,
 }

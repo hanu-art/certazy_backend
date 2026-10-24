@@ -5,7 +5,9 @@ import * as queries from '../modules/auth/auth.queries.js'
 
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.cookies?.accessToken
+    const authHeader = req.headers.authorization
+    const bearerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null
+    const token = req.cookies?.accessToken || bearerToken
    
     if (!token) {
       const err = new Error('Access token required')
