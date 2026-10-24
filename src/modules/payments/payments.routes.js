@@ -24,8 +24,9 @@ router.post(
 router.post('/paypal/create-order',  authenticate, role('student'), controller.paypalCreateOrder)
 router.post('/paypal/capture',       authenticate, role('student'), controller.paypalCapture)
 
-// ─── HISTORY ──────────────────────────────────────────────────
-router.get('/history',     authenticate, role('student'),                                      controller.getMyPayments)
-router.get('/admin/all',   authenticate, role('admin', 'sub_admin'), permission('can_view_payments'), controller.getAllPayments)
+// ─── HISTORY & STATS ──────────────────────────────────────────
+router.get('/history',       authenticate, role('student'),                                      controller.getMyPayments)
+router.get('/admin/all',     authenticate, role('admin', 'sub_admin'), permission('can_view_payments'), controller.getAllPayments)
+router.get('/admin/revenue', authenticate, role('admin', 'sub_admin'), permission('can_view_payments'), controller.getRevenueStats)
 
 export default router

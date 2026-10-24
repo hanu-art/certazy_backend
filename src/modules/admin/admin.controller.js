@@ -53,4 +53,21 @@ const createSubAdmin = async (req, res, next) => {
   }
 }
 
-export { getPermissions, createPermissions, updatePermissions, deletePermissions, createSubAdmin }
+// ── GET /admin/dashboard ──────────────────────────────────────────────────
+const getDashboardStats = async (req, res, next) => {
+  try {
+    const stats = await service.getDashboardStats()
+    return success(res, { message: 'Dashboard stats fetched', data: stats })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export {
+  getPermissions,
+  createPermissions,
+  updatePermissions,
+  deletePermissions,
+  createSubAdmin,
+  getDashboardStats,
+}

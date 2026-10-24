@@ -80,6 +80,16 @@ const getAllPayments = async (req, res, next) => {
   }
 }
 
+// ── GET /payments/admin/revenue ───────────────────────────────────────────
+const getRevenueStats = async (req, res, next) => {
+  try {
+    const data = await service.getRevenueStats()
+    return success(res, { message: 'Revenue stats fetched', data })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export {
   razorpayCreateOrder,
   razorpayVerify,
@@ -88,4 +98,5 @@ export {
   paypalCapture,
   getMyPayments,
   getAllPayments,
+  getRevenueStats,
 }

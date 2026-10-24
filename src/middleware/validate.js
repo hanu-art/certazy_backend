@@ -27,7 +27,7 @@ const registerSchema = Joi.object({
   password: Joi.string()
     .min(8)
     .max(72)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`])/)
     .required()
     .messages({
       'string.pattern.base': 'Password must have uppercase, lowercase, number and special character',
@@ -44,7 +44,7 @@ const changePasswordSchema = Joi.object({
   newPassword    : Joi.string()
     .min(8)
     .max(72)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`])/)
     .required()
     .messages({
       'string.pattern.base': 'Password must have uppercase, lowercase, number and special character',
@@ -213,7 +213,7 @@ const createSubAdminSchema = Joi.object({
   password: Joi.string()
     .min(8)
     .max(72)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`])/)
     .required()
     .messages({
       'string.pattern.base': 'Password must have uppercase, lowercase, number and special character',

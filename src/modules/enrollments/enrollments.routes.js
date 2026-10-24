@@ -7,11 +7,11 @@ import role          from '../../middleware/role.js'
 
 const router = Router()
 
+// ─── ADMIN / SUB-ADMIN ────────────────────────────────────────
+router.get('/admin/all',   authenticate, role('admin', 'sub_admin'),   controller.getAllEnrollments)
+
 // ─── STUDENT ──────────────────────────────────────────────────
 router.get('/',            authenticate, role('student'),              controller.getMyEnrollments)
 router.get('/:courseId',   authenticate, role('student'),              controller.checkEnrollment)
-
-// ─── ADMIN / SUB-ADMIN ────────────────────────────────────────
-router.get('/admin/all',   authenticate, role('admin', 'sub_admin'),   controller.getAllEnrollments)
 
 export default router

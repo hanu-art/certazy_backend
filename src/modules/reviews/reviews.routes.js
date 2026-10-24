@@ -7,15 +7,16 @@ import role            from '../../middleware/role.js'
 
 const router = Router()
 
+// ─── ADMIN ────────────────────────────────────────────────────
+router.get('/admin/all',         authenticate, role('admin', 'sub_admin'), controller.getAllReviews)
+router.get('/admin/pending',     authenticate, role('admin', 'sub_admin'), controller.getPendingReviews)
+router.put('/:id/approval',      authenticate, role('admin', 'sub_admin'), controller.updateApprovalStatus)
+router.delete('/:id',            authenticate, role('admin'),              controller.deleteReview)
+
 // ─── PUBLIC ───────────────────────────────────────────────────
 router.get('/:courseId',         controller.getReviewsByCourseId)
 
 // ─── STUDENT ──────────────────────────────────────────────────
 router.post('/',                 authenticate, role('student'),            controller.createReview)
-
-// ─── ADMIN ────────────────────────────────────────────────────
-router.get('/admin/all',         authenticate, role('admin', 'sub_admin'), controller.getAllReviews)
-router.put('/:id/approval',      authenticate, role('admin', 'sub_admin'), controller.updateApprovalStatus)
-router.delete('/:id',            authenticate, role('admin'),              controller.deleteReview)
 
 export default router
