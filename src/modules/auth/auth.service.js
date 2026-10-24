@@ -18,7 +18,7 @@ const register = async ({ name, email, password }) => {
   const userId = await queries.createUser({ name, email, password: hashedPassword })
   const user = await queries.findById(userId)
 
-  sendWelcomeJob({ to: email, name }) // fire and forget
+  sendWelcomeJob({ to: email, name })?.catch?.((e) => console.warn('[AUTH] Welcome email queue notice:', e?.message)) // fire and forget
   return user
 }
 

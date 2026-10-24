@@ -58,10 +58,26 @@ const deleteReview = async (req, res, next) => {
   }
 }
 
+// ── GET /reviews/admin/pending — pending reviews (admin) ───────────────────
+const getPendingReviews = async (req, res, next) => {
+  try {
+    const { limit = 10 } = req.query
+    const result = await service.getAllReviews({ page: 1, limit, is_approved: 0 })
+    return success(res, {
+      message   : 'Pending reviews fetched',
+      data      : result.reviews,
+      pagination: result.pagination,
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export { 
   createReview,
   getReviewsByCourseId, 
   getAllReviews, 
+  getPendingReviews,
   updateApprovalStatus, 
   deleteReview 
 }

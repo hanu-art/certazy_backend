@@ -91,7 +91,7 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, email, avatar
 
     if (oauthRows.length > 0) {
       await conn.commit()
-      return oauthRows[0]
+      return { ...oauthRows[0], isNewUser: false }
     }
 
     const [emailRows] = await conn.query(
@@ -100,6 +100,7 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, email, avatar
     )
 
     let userId
+    let isNewUser = false
 
     if (emailRows.length > 0) {
       userId = emailRows[0].id
@@ -110,6 +111,7 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, email, avatar
         [name, email, avatar, provider, providerId]
       )
       userId = result.insertId
+      isNewUser = true
     }
 
     await conn.query(
@@ -123,7 +125,7 @@ const findOrCreateOAuthUser = async ({ provider, providerId, name, email, avatar
     )
 
     await conn.commit()
-    return userRows[0]
+    return { ...userRows[0], isNewUser }
   } catch (err) {
     await conn.rollback()
     throw err
